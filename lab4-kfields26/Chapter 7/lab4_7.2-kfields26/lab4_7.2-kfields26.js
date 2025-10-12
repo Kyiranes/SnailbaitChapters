@@ -1007,7 +1007,7 @@ SnailBait.prototype = {
                             [ this.paceBehavior,
                               this.snailShootBehavior,
                               new CycleBehavior(300,  // 300ms per image
-                                                1500) // 1.5 seconds interlude 
+                                                1000) // 1.5 seconds interlude 
                             ]);
 
          snail.width  = this.SNAIL_CELLS_WIDTH;

@@ -911,11 +911,11 @@ SnailBait.prototype = {
 
       this.runner.ascendTimer =
          new AnimationTimer(this.runner.JUMP_DURATION/2,
-                            AnimationTimer.makeEaseOutEasingFunction(1.1));
+                            /*AnimationTimer.makeEaseOutEasingFunction(1.1)*/);
          
       this.runner.descendTimer =
          new AnimationTimer(this.runner.JUMP_DURATION/2,
-                            AnimationTimer.makeEaseInEasingFunction(1.1));
+                            /*AnimationTimer.makeEaseInEasingFunction(1.1)*/);
 
       this.runner.jump = function () {
          if (this.jumping) // 'this' is the runner

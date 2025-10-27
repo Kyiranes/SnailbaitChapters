@@ -2,15 +2,6 @@ var SnailBait = function () {
    this.canvas = document.getElementById('game-canvas'),
    this.context = this.canvas.getContext('2d'),
    this.fpsElement = document.getElementById('fps'),
-   
-   // Time..............................................................
-
-   this.timeSystem = new TimeSystem(); // See js/timeSystem.js
-
-   this.timeRate = 1.0; // 1.0 is normal speed, 0.5 is 1/2 speed, etc.
-
-   this.SHORT_DELAY = 50; // milliseconds
-   this.TIME_RATE_DURING_TRANSITIONS = 0.2; // percent
 
    // Constants.........................................................
 
@@ -577,7 +568,7 @@ var SnailBait = function () {
    ];
 
    this.sapphireData = [
-      { left: 70,  
+      { left: 110,  
          top: this.TRACK_1_BASELINE - this.SAPPHIRE_CELLS_HEIGHT },
 
       { left: 880,  
@@ -594,7 +585,7 @@ var SnailBait = function () {
    ];
 
    this.rubyData = [
-      { left: 690,  
+      { left: 710,  
          top: this.TRACK_1_BASELINE - this.RUBY_CELLS_HEIGHT },
 
       { left: 1700, 
@@ -756,21 +747,21 @@ var SnailBait = function () {
    };
 
    this.jumpBehavior = {
-      pause: function (sprite, now) {
+      pause: function (sprite) {
          if (sprite.ascendTimer.isRunning()) {
-            sprite.ascendTimer.pause(now);
+            sprite.ascendTimer.pause();
          }
          else if (sprite.descendTimer.isRunning()) {
-            sprite.descendTimer.pause(now);
+            sprite.descendTimer.pause();
          }
       },
 
-      unpause: function (sprite, now) {
+      unpause: function (sprite) {
          if (sprite.ascendTimer.isRunning()) {
-            sprite.ascendTimer.unpause(now);
+            sprite.ascendTimer.unpause();
          }         
          else if (sprite.descendTimer.isRunning()) {
-            sprite.descendTimer.unpause(now);
+            sprite.descendTimer.unpause();
          }
       },
 
@@ -778,44 +769,42 @@ var SnailBait = function () {
          return sprite.ascendTimer.isRunning();
       },
 
-      ascend: function (sprite, now) {
-         var elapsed = sprite.ascendTimer.getElapsedTime(now),
+      ascend: function (sprite) {
+         var elapsed = sprite.ascendTimer.getElapsedTime(),
              deltaY  = elapsed / (sprite.JUMP_DURATION/2) * sprite.JUMP_HEIGHT;
 
          sprite.top = sprite.verticalLaunchPosition - deltaY; // Moving up
       },
 
-      isDoneAscending: function (sprite, now) {
-         return sprite.ascendTimer.getElapsedTime(now) > 
-                sprite.JUMP_DURATION/2;
+      isDoneAscending: function (sprite) {
+         return sprite.ascendTimer.getElapsedTime() > sprite.JUMP_DURATION/2;
       },
 
-      finishAscent: function (sprite, now) {
+      finishAscent: function (sprite) {
          sprite.jumpApex = sprite.top;
-         sprite.ascendTimer.stop(now);
-         sprite.descendTimer.start(now);
+         sprite.ascendTimer.stop();
+         sprite.descendTimer.start();
       },
 
       isDescending: function (sprite) {
          return sprite.descendTimer.isRunning();
       },
 
-      descend: function (sprite, now) {
-         var elapsed = sprite.descendTimer.getElapsedTime(now),
+      descend: function (sprite, verticalVelocity, fps) {
+         var elapsed = sprite.descendTimer.getElapsedTime(),
              deltaY  = elapsed / (sprite.JUMP_DURATION/2) * sprite.JUMP_HEIGHT;
 
          sprite.top = sprite.jumpApex + deltaY; // Moving down
       },
 
-      isDoneDescending: function (sprite, now) {
-         return sprite.descendTimer.getElapsedTime(now) > 
-                sprite.JUMP_DURATION/2;
+      isDoneDescending: function (sprite) {
+         return sprite.descendTimer.getElapsedTime() > sprite.JUMP_DURATION/2;
       },
 
-      finishDescent: function (sprite, now) {
+      finishDescent: function (sprite) {
          sprite.top = sprite.verticalLaunchPosition;
-         sprite.stopJumping();
          sprite.runAnimationRate = snailBait.RUN_ANIMATION_RATE;
+         sprite.stopJumping();
       },
 
       execute: function (sprite, now, fps, context, 
@@ -825,12 +814,12 @@ var SnailBait = function () {
          }
 
          if (this.isAscending(sprite)) {
-            if ( ! this.isDoneAscending(sprite, now)) this.ascend(sprite, now);
-            else                                this.finishAscent(sprite, now);
+            if ( ! this.isDoneAscending(sprite)) this.ascend(sprite);
+            else                               this.finishAscent(sprite);
          }
          else if (this.isDescending(sprite)) {
-            if ( ! this.isDoneDescending(sprite, now)) this.descend(sprite, now);
-            else                                 this.finishDescent(sprite, now);
+            if ( ! this.isDoneDescending(sprite)) this.descend(sprite);
+            else                                  this.finishDescent(sprite);
          }
       }
    };
@@ -921,12 +910,14 @@ SnailBait.prototype = {
       this.runner.track   = INITIAL_TRACK;
 
       this.runner.ascendTimer =
-         new AnimationTimer(this.runner.JUMP_DURATION/2,
+      new AnimationTimer(this.runner.JUMP_DURATION/2,
                             AnimationTimer.makeEaseOutEasingFunction(1.1));
          
+      
       this.runner.descendTimer =
          new AnimationTimer(this.runner.JUMP_DURATION/2,
                             AnimationTimer.makeEaseInEasingFunction(1.1));
+         
 
       this.runner.jump = function () {
          if (this.jumping) // 'this' is the runner
@@ -935,26 +926,17 @@ SnailBait.prototype = {
          this.jumping = true;
          this.runAnimationRate = 0; // Freeze the runner while jumping
          this.verticalLaunchPosition = this.top;
-         this.ascendTimer.start(snailBait.timeSystem.calculateGameTime());
+         this.ascendTimer.start();
       };
 
       this.runner.stopJumping = function () {
          this.descendTimer.stop();
          this.jumping = false;
       };
-
    },
 
    equipRunner: function () {
       this.equipRunnerForJumping();
-   },
-
-   setTimeRate: function (rate) {
-      this.timeRate = rate;
-
-      this.timeSystem.setTransducer( function (now) {
-         return now * snailBait.timeRate;
-      });      
    },
 
    initializeSprites: function() {  
@@ -1012,8 +994,7 @@ SnailBait.prototype = {
          this.bees.push(bee);
       }
    },
-   
-   createButtonSprites: function () {
+ createButtonSprites: function () {
       var button;
 
       for (var i = 0; i < this.buttonData.length; ++i) {
@@ -1281,6 +1262,10 @@ SnailBait.prototype = {
       this.drawBackground();
       this.updateSprites(now);
       this.drawSprites();
+      /*
+      this.drawRunner();
+      this.drawPlatforms();
+      */
    },
 
    setPlatformVelocity: function () {
@@ -1291,6 +1276,7 @@ SnailBait.prototype = {
    setOffsets: function (now) {
       this.setBackgroundOffset(now);
       this.setSpriteOffsets(now);
+      //this.setPlatformOffset(now);
    },
 
    setBackgroundOffset: function (now) {
@@ -1384,7 +1370,7 @@ SnailBait.prototype = {
    },
 
    calculateFps: function (now) {
-      var fps = 1 / (now - this.lastAnimationFrameTime) * 1000 * this.timeRate;
+      var fps = 1 / (now - this.lastAnimationFrameTime) * 1000;
 
       if (now - this.lastFpsUpdateTime > 1000) {
          this.lastFpsUpdateTime = now;
@@ -1473,11 +1459,6 @@ SnailBait.prototype = {
    // Animation.........................................................
 
    animate: function (now) { 
-      // Replace the time passed to this method by the browser
-      // with the time from Snail Bait's time system
-
-      now = snailBait.timeSystem.calculateGameTime();
-
       if (snailBait.paused) {
          setTimeout( function () {
             requestNextAnimationFrame(snailBait.animate);
@@ -1491,7 +1472,7 @@ SnailBait.prototype = {
       }
    },
 
-   togglePausedStateOfAllBehaviors: function (now) {
+   togglePausedStateOfAllBehaviors: function () {
       var behavior;
    
       for (var i=0; i < this.sprites.length; ++i) {
@@ -1502,12 +1483,12 @@ SnailBait.prototype = {
 
             if (this.paused) {
                if (behavior.pause) {
-                  behavior.pause(sprite, now);
+                  behavior.pause(sprite);
                }
             }
             else {
                if (behavior.unpause) {
-                  behavior.unpause(sprite, now);
+                  behavior.unpause(sprite);
                }
             }
          }
@@ -1515,11 +1496,11 @@ SnailBait.prototype = {
    },
 
    togglePaused: function () {
-      var now = this.timeSystem.calculateGameTime();
+      var now = +new Date();
 
       this.paused = !this.paused;
 
-      this.togglePausedStateOfAllBehaviors(now);
+      this.togglePausedStateOfAllBehaviors();
 
       if (this.paused) {
          this.pauseStartTime = now;
@@ -1539,6 +1520,7 @@ SnailBait.prototype = {
 
       setTimeout ( function () {
          snailBait.startGame();
+         snailBait.gameStarted = true;
       }, LOADING_SCREEN_TRANSITION_DURATION);
    },
 
@@ -1623,12 +1605,6 @@ SnailBait.prototype = {
    startGame: function () {
       this.revealGame();
       this.revealInitialToast();
-
-      this.timeSystem.start();
-      this.setTimeRate(0.1);
-
-      this.gameStarted = true;
-
       requestNextAnimationFrame(this.animate);
    }
 };
@@ -1648,15 +1624,6 @@ window.onkeydown = function (e) {
    }
    else if (key === 74) { // 'j'
       snailBait.runner.jump();
-   }
-   else if(key === 67){
-      if(snailSlow = true){
-         snailBait.setTimeRate(0.1);
-      }
-      else{
-      snailSlow = true;
-      this.setTimeRate(0.05);
-      }
    }
 };
 

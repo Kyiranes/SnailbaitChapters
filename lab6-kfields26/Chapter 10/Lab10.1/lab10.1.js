@@ -1384,7 +1384,7 @@ SnailBait.prototype = {
    },
 
    calculateFps: function (now) {
-      var fps = 1 / (now - this.lastAnimationFrameTime) * 1000 * this.timeRate;
+      var fps = 1 * (now - this.lastAnimationFrameTime) * 1000 * this.timeRate;
 
       if (now - this.lastFpsUpdateTime > 1000) {
          this.lastFpsUpdateTime = now;
@@ -1649,8 +1649,9 @@ window.onkeydown = function (e) {
    else if (key === 74) { // 'j'
       snailBait.runner.jump();
    }
-   else if(key === 67){
+   /* else if(key === 67){
       if(snailSlow = true){
+         snailSlow = false;
          snailBait.setTimeRate(0.1);
       }
       else{
@@ -1658,6 +1659,7 @@ window.onkeydown = function (e) {
       this.setTimeRate(0.05);
       }
    }
+      */
 };
 
 window.onblur = function (e) {  // pause if unpaused

@@ -216,112 +216,112 @@ var SnailBait = function () {
 
 SnailBait.prototype = {
    draw: function (now) {
-      this.setPlatformVelocity();
-      this.setOffsets(now);
+      snailBait.setPlatformVelocity();
+      snailBait.setOffsets(now);
 
-      this.drawBackground();
-      this.drawRunner();
-      this.drawPlatforms();
+      snailBait.drawBackground();
+      snailBait.drawRunner();
+      snailBait.drawPlatforms();
    },
 
    setPlatformVelocity: function () {
-      this.platformVelocity = this.bgVelocity * 
-                              this.PLATFORM_VELOCITY_MULTIPLIER; 
+      snailBait.platformVelocity = snailBait.bgVelocity * 
+                              snailBait.PLATFORM_VELOCITY_MULTIPLIER; 
    },
 
    setOffsets: function (now) {
-      this.setBackgroundOffset(now);
-      this.setPlatformOffset(now);
+      snailBait.setBackgroundOffset(now);
+      snailBait.setPlatformOffset(now);
    },
 
    setBackgroundOffset: function (now) {
-      this.backgroundOffset +=
-         this.bgVelocity * (now - this.lastAnimationFrameTime) / 1000;
+      snailBait.backgroundOffset +=
+         snailBait.bgVelocity * (now - snailBait.lastAnimationFrameTime) / 1000;
 
-      if (this.backgroundOffset < 0 || 
-          this.backgroundOffset > this.background.width) {
-         this.backgroundOffset = 0;
+      if (snailBait.backgroundOffset < 0 || 
+          snailBait.backgroundOffset > snailBait.background.width) {
+         snailBait.backgroundOffset = 0;
       }
    },
 
    setPlatformOffset: function (now) {
-      this.platformOffset += 
-         this.platformVelocity * (now - this.lastAnimationFrameTime) / 1000;
+      snailBait.platformOffset += 
+         snailBait.platformVelocity * (now - snailBait.lastAnimationFrameTime) / 1000;
 
-      if (this.platformOffset > 2*this.background.width) {
-         this.turnLeft();
+      if (snailBait.platformOffset > 2*snailBait.background.width) {
+         snailBait.turnLeft();
       }
-      else if (this.platformOffset < 0) {
-         this.turnRight();
+      else if (snailBait.platformOffset < 0) {
+         snailBait.turnRight();
       }
    },
 
    drawBackground: function () {
-      this.context.translate(-this.backgroundOffset, 0);
+      snailBait.context.translate(-snailBait.backgroundOffset, 0);
 
       // Initially onscreen:
-      this.context.drawImage(this.background, 0, 0);
+      snailBait.context.drawImage(snailBait.background, 0, 0);
 
       // Initially offscreen:
-      this.context.drawImage(this.background, this.background.width, 0);
+      snailBait.context.drawImage(snailBait.background, snailBait.background.width, 0);
 
-      this.context.translate(this.backgroundOffset, 0);
+      snailBait.context.translate(snailBait.backgroundOffset, 0);
    },
 
    drawRunner: function () {
-      this.context.drawImage(
-         this.runnerImage,
-         this.RUNNER_LEFT,
-         this.calculatePlatformTop(this.runnerTrack) - 
-            this.runnerImage.height);
+      snailBait.context.drawImage(
+         snailBait.runnerImage,
+         snailBait.RUNNER_LEFT,
+         snailBait.calculatePlatformTop(snailBait.runnerTrack) - 
+            snailBait.runnerImage.height);
    },
 
    drawPlatform: function (data) {
-      var platformTop = this.calculatePlatformTop(data.track);
+      var platformTop = snailBait.calculatePlatformTop(data.track);
 
-      this.context.lineWidth = this.PLATFORM_STROKE_WIDTH;
-      this.context.strokeStyle = this.PLATFORM_STROKE_STYLE;
-      this.context.fillStyle = data.fillStyle;
-      this.context.globalAlpha = data.opacity;
+      snailBait.context.lineWidth = snailBait.PLATFORM_STROKE_WIDTH;
+      snailBait.context.strokeStyle = snailBait.PLATFORM_STROKE_STYLE;
+      snailBait.context.fillStyle = data.fillStyle;
+      snailBait.context.globalAlpha = data.opacity;
 
-      this.context.strokeRect(data.left, platformTop, data.width, data.height);
-      this.context.fillRect  (data.left, platformTop, data.width, data.height);
+      snailBait.context.strokeRect(data.left, platformTop, data.width, data.height);
+      snailBait.context.fillRect  (data.left, platformTop, data.width, data.height);
    },
 
    drawPlatforms: function () {
       var index;
 
-      this.context.translate(-this.platformOffset, 0);
+      snailBait.context.translate(-snailBait.platformOffset, 0);
 
-      for (index = 0; index < this.platformData.length; ++index) {
-         this.drawPlatform(this.platformData[index]);
+      for (index = 0; index < snailBait.platformData.length; ++index) {
+         snailBait.drawPlatform(snailBait.platformData[index]);
       }
 
-      this.context.translate(this.platformOffset, 0);
+      snailBait.context.translate(snailBait.platformOffset, 0);
    },
 
    calculateFps: function (now) {
-      var fps = 1 / (now - this.lastAnimationFrameTime) * 1000;
+      var fps = 1 / (now - snailBait.lastAnimationFrameTime) * 1000;
 
-      if (now - this.lastFpsUpdateTime > 1000) {
-         this.lastFpsUpdateTime = now;
-         this.fpsElement.innerHTML = fps.toFixed(0) + ' fps';
+      if (now - snailBait.lastFpsUpdateTime > 1000) {
+         snailBait.lastFpsUpdateTime = now;
+         snailBait.fpsElement.innerHTML = fps.toFixed(0) + ' fps';
       }
       return fps; 
    },
 
    calculatePlatformTop: function (track) {
-      if      (track === 1) { return this.TRACK_1_BASELINE; } // 323 pixels
-      else if (track === 2) { return this.TRACK_2_BASELINE; } // 223 pixels
-      else if (track === 3) { return this.TRACK_3_BASELINE; } // 123 pixels
+      if      (track === 1) { return snailBait.TRACK_1_BASELINE; } // 323 pixels
+      else if (track === 2) { return snailBait.TRACK_2_BASELINE; } // 223 pixels
+      else if (track === 3) { return snailBait.TRACK_3_BASELINE; } // 123 pixels
    },
 
    turnLeft: function () {
-      this.bgVelocity = -this.BACKGROUND_VELOCITY;
+      snailBait.bgVelocity = -snailBait.BACKGROUND_VELOCITY;
    },
 
    turnRight: function () {
-      this.bgVelocity = this.BACKGROUND_VELOCITY;
+      snailBait.bgVelocity = snailBait.BACKGROUND_VELOCITY;
    },
 
    revealToast: function (text, duration) {
@@ -329,8 +329,8 @@ SnailBait.prototype = {
       
       duration = duration || DEFAULT_TOAST_DISPLAY_DURATION;
 
-      this.toastElement.style.display = 'block';
-      this.toastElement.innerHTML = text;
+      snailBait.toastElement.style.display = 'block';
+      snailBait.toastElement.innerHTML = text;
 
       setTimeout( function (e) {
          if (snailBait.windowHasFocus) {
@@ -358,29 +358,29 @@ SnailBait.prototype = {
    togglePaused: function () {
       var now = +new Date();
 
-      this.paused = !this.paused;
+      snailBait.paused = !snailBait.paused;
    
-      if (this.paused) {
-         this.pauseStartTime = now;
+      if (snailBait.paused) {
+         snailBait.pauseStartTime = now;
       }
       else {
-         this.lastAnimationFrameTime += (now - this.pauseStartTime);
+         snailBait.lastAnimationFrameTime += (now - snailBait.pauseStartTime);
       }
    },
 
    // ------------------------- INITIALIZATION ----------------------------
 
    initializeImages: function () {
-      this.background.src = 'images/background.png';
-      this.runnerImage.src = 'images/runner.png';
+      snailBait.background.src = 'images/background.png';
+      snailBait.runnerImage.src = 'images/runner.png';
 
-      this.background.onload = function (e) {
+      snailBait.background.onload = function (e) {
          snailBait.startGame();
       };
    },
 
    startGame: function () {
-      requestNextAnimationFrame(this.animate);
+      requestNextAnimationFrame(snailBait.animate);
    }
 };
 

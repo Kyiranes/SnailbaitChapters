@@ -890,6 +890,10 @@ var SnailBait = function () {
       processBadGuyCollision: function (sprite) {
          console.log("enemy collided with")
       },
+      processGoodGuyCollision: function(sprite){
+         scoreElement += 1;
+         console.log("Score is attempting to be changed")
+      },
 
       processCollision: function (sprite, otherSprite) {
          if (sprite.jumping && 'platform' === otherSprite.type) {
@@ -897,10 +901,9 @@ var SnailBait = function () {
          }
          else if ('coin'  === otherSprite.type    || 
                   'sapphire' === otherSprite.type ||
-                  'ruby' === otherSprite.type     || 
-                  'snail bomb' === otherSprite.type ||
-                  'snail' === otherSprite.type) {
+                  'ruby' === otherSprite.type) {
             otherSprite.visible = false;
+            this.processGoodGuyCollision(sprite);
          }
 
          if ('bat' === otherSprite.type || 'bee' === otherSprite.type ||
